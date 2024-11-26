@@ -7,7 +7,7 @@
     "dev": "vercel dev"
   },
   "dependencies": {
-    "node-fetch": "^2.6.1"  // Version 2 for compatibility
+    "node-fetch": "^2.6.1"
   },
   "devDependencies": {},
   "engines": {
