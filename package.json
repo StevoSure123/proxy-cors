@@ -1,3 +1,16 @@
-"dependencies": {
-  "node-fetch": "^3.3.1"
+{
+  "name": "cors-proxy",
+  "version": "1.0.0",
+  "description": "A simple CORS proxy for m3u8 files",
+  "main": "api/proxy.js",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.1"  // Version 2 for compatibility
+  },
+  "devDependencies": {},
+  "engines": {
+    "node": "14.x"
+  }
 }
