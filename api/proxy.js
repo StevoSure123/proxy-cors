@@ -1,5 +1,7 @@
+const fetch = require('node-fetch'); // Ensure node-fetch is installed
+
 module.exports = async (req, res) => {
-    // Handle preflight OPTIONS request
+    // Handle preflight requests
     if (req.method === 'OPTIONS') {
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -8,19 +10,19 @@ module.exports = async (req, res) => {
         return;
     }
 
-    // Restrict to GET requests
+    // Only allow GET requests for the proxy
     if (req.method !== 'GET') {
-        res.status(405).send('Method Not Allowed'); // 405 for unsupported methods
+        res.status(405).send('Method Not Allowed');
         return;
     }
 
     const { url } = req.query;
 
-    // Validate the URL parameter
     if (!url) {
         res.status(400).send('Missing "url" parameter');
         return;
     }
+
     if (!url.includes('.m3u8')) {
         res.status(400).send('URL must point to an m3u8 file');
         return;
@@ -28,8 +30,9 @@ module.exports = async (req, res) => {
 
     try {
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 5000); // 5-second timeout
+        const timeout = setTimeout(() => controller.abort(), 10000); // 10 seconds timeout
 
+        // Fetch the .m3u8 file
         const response = await fetch(url, { signal: controller.signal });
         clearTimeout(timeout);
 
@@ -38,18 +41,18 @@ module.exports = async (req, res) => {
             return;
         }
 
-        // Get the m3u8 file content
+        // Get m3u8 content
         const data = await response.text();
 
-        // Set headers for CORS and content type
-        res.setHeader('Access-Control-Allow-Origin', '*'); // CORS header
-        res.setHeader('Content-Type', 'application/vnd.apple.mpegurl'); // m3u8 content type
+        // Add CORS headers and serve the file
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Content-Type', 'application/vnd.apple.mpegurl'); // Ensure correct m3u8 content type
         res.status(200).send(data);
     } catch (error) {
         if (error.name === 'AbortError') {
-            res.status(504).send('Request timed out'); // Timeout error
+            res.status(504).send('Request timed out');
         } else {
-            res.status(500).send(`Error fetching m3u8 file: ${error.message}`); // Generic error
+            res.status(500).send(`Error fetching m3u8 file: ${error.message}`);
         }
     }
 };
