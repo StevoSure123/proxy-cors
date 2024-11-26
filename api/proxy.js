@@ -21,7 +21,7 @@ module.exports = async (req, res) => {
         res.status(400).send('Missing "url" parameter');
         return;
     }
-    if (!url.endsWith('.m3u8')) {
+    if (!url.includes('.m3u8')) {
         res.status(400).send('URL must point to an m3u8 file');
         return;
     }
